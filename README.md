@@ -20,3 +20,5 @@ execute(db, """select decompress(compress("hello"))""")
 Performs sanity and consistency check of the compressor-decompressor pair when registering.
 
 Tests cover both happy paths and errors, for a range of codecs and for different `SQLite.jl`-compatible packages.
+
+See https://aplavin.github.io/SQLiteCompress.jl/examples/notebook.html for benchmarks.
