@@ -38,10 +38,8 @@ using CodecZstd, CodecZlib, CodecBzip2, CodecLz4, CodecXz
     @test all(r.ok == 1 for r in rowtable(execute(db, "select y == compress(x) as ok from tbl")))
     @test all(r.ok == 1 for r in rowtable(execute(db, "select quote(decompress(y)) == quote(x) as ok from tbl")))
 
-    # SQLite.jl seems to return a nul-terminated string from UDF
-    # it doesn't compare equal in SQL, can be checked with hex()
-    @test_broken only(rowtable(execute(db, """select decompress(compress("hello")) == "hello" as x"""))).x == 1
-    @test_broken all(r.ok == 1 for r in rowtable(execute(db, "select decompress(y) == x as ok from tbl")))
+    @test only(rowtable(execute(db, """select decompress(compress("hello")) == "hello" as x"""))).x == 1
+    @test all(r.ok == 1 for r in rowtable(execute(db, "select decompress(y) == x as ok from tbl")))
 end
 
 
