@@ -19,6 +19,11 @@ using CodecZstd, CodecZlib, CodecBzip2, CodecLz4, CodecXz
     @test only(rowtable(execute(db, """select decompress(compress("hello")) as x"""))).x == "hello"
     @test only(rowtable(execute(db, """select compress("hello") as x"""))).x == transcode(ZstdCompressor, "hello")
     @test only(rowtable(execute(db, """select decompress(compress(decompress(compress("hello")))) == decompress(compress("hello")) as x"""))).x == 1
+
+    @testset for str in ["hello", "", "ололо"]
+        @test only(rowtable(execute(db, """select decompress(compress("$str")) as x"""))).x == str
+        @test only(rowtable(execute(db, """select compress("$str") as x"""))).x == transcode(ZstdCompressor, str)
+    end
     
     execute(db, "create table tbl ( x text not null check (typeof(x) = 'text'), y blob not null check (typeof(y) = 'blob') )")
     execute(db, "insert into tbl (x, y) values (?, ?)", ("hello", transcode(ZstdCompressor, "hello")))
@@ -56,9 +61,13 @@ end
         @test_throws ArgumentError register_compression!(db, reverse(cdecomp))
         register_compression!(db, cdecomp)
         @test only(rowtable(execute(db, """select decompress(compress("hello")) as x"""))).x == "hello"
+
+        @testset for str in ["hello", "", "ололо"]
+            @test only(rowtable(execute(db, """select decompress(compress("$str")) as x"""))).x == str
+            @test only(rowtable(execute(db, """select compress("$str") as x"""))).x == transcode(cdecomp[1], str)
+        end
     end
 end
-
 
 @testset "sqlcipher" begin
     @testset for cdecomp in [
