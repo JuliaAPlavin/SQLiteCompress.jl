@@ -14,7 +14,7 @@ They apply the Julia function `TranscodingStreams.transcode` with provided compr
 
 - `db`: SQLite database from `SQLite.jl` or compatible
 - `(comp, decomp)`: `TranscodingStreams` codecs, e.g. `(ZstdCompressor, ZstdDecompressor)`
-- `do_codec_checks`: whether to perform sanity checks on provided codecs
+- `do_codec_checks`: whether to perform sanity and consistency checks on provided codecs
 """
 function register_compression!(db, (comp, decomp); do_codec_checks=true)
     modul = first(methods(typeof(db))).module  # e.g., SQLite
