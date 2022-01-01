@@ -63,6 +63,7 @@ end
         @test only(rowtable(execute(db, """select decompress(compress("hello")) as x"""))).x == "hello"
 
         @testset for str in ["hello", "", "ололо"]
+            if cdecomp[2] == LZ4SafeDecompressor && str == "" continue end  # produces zero-byte blobs, cannot be read with SQLite.jl
             @test only(rowtable(execute(db, """select decompress(compress("$str")) as x"""))).x == str
             @test only(rowtable(execute(db, """select compress("$str") as x"""))).x == transcode(cdecomp[1], str)
         end
